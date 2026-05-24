@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정시원 경력기술서</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    :root {
+      --paper-width: 210mm;
+      --paper-height: 297mm;
+      --page-x: 15mm;
+      --page-y: 13.5mm;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #d8dde5;
+      --soft-line: #edf0f4;
+      --accent: #2457a6;
+      --accent-soft: #edf4ff;
+      --title: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: #eef1f5;
+      color: var(--ink);
+      font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      font-size: 8.75pt;
+      line-height: 1.44;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 0.2mm solid rgba(36, 87, 166, 0.35);
+    }
+
+    .document {
+      width: var(--paper-width);
+      margin: 0 auto;
+    }
+
+    .page {
+      position: relative;
+      width: var(--paper-width);
+      min-height: var(--paper-height);
+      margin: 10mm auto;
+      padding: var(--page-y) var(--page-x);
+      background: #fff;
+      box-shadow: 0 8mm 24mm rgba(15, 23, 42, 0.14);
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .page-mark {
+      position: absolute;
+      top: 8mm;
+      right: var(--page-x);
+      color: var(--muted);
+      font-size: 7.8pt;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin: 0;
+    }
+
+    .doc-header {
+      display: grid;
+      grid-template-columns: 1fr 38mm;
+      gap: 8mm;
+      padding-bottom: 5mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8pt;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin-top: 1.5mm;
+      color: var(--title);
+      font-size: 21pt;
+      line-height: 1.12;
+      font-weight: 850;
+    }
+
+    .headline {
+      margin-top: 2.5mm;
+      color: #343a46;
+      font-size: 9.6pt;
+    }
+
+    .profile {
+      align-self: end;
+      color: var(--muted);
+      font-size: 8.2pt;
+      text-align: right;
+    }
+
+    section {
+      margin-top: 5.8mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+      color: var(--title);
+      font-size: 12.2pt;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    h2::before {
+      content: "";
+      display: block;
+      width: 3mm;
+      height: 3mm;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h3 {
+      margin-top: 4.5mm;
+      padding: 2.6mm 3.2mm;
+      border-left: 1mm solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--title);
+      font-size: 10.4pt;
+      line-height: 1.28;
+      font-weight: 850;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h4 {
+      margin-top: 3.4mm;
+      color: var(--accent);
+      font-size: 9.2pt;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .company {
+      display: grid;
+      grid-template-columns: 38mm minmax(0, 1fr);
+      gap: 6mm;
+      margin-top: 4mm;
+      padding-top: 4mm;
+      border-top: 0.25mm solid var(--soft-line);
+    }
+
+    .company-name {
+      color: var(--title);
+      font-size: 11.4pt;
+      font-weight: 850;
+    }
+
+    .period {
+      margin-top: 1mm;
+      color: var(--muted);
+      font-size: 8.1pt;
+      font-weight: 800;
+    }
+
+    .company-desc {
+      color: #353b45;
+    }
+
+    .two-blocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 4mm;
+    }
+
+    .block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .block-title {
+      color: var(--title);
+      font-weight: 850;
+    }
+
+    ul {
+      margin: 1.8mm 0 0;
+      padding-left: 4.2mm;
+    }
+
+    li {
+      margin-top: 0.9mm;
+    }
+
+    .project {
+      margin-top: 4.5mm;
+      padding-top: 3.8mm;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .project:first-of-type {
+      border-top: 0;
+    }
+
+    .project-title {
+      color: var(--title);
+      font-size: 10.5pt;
+      font-weight: 850;
+    }
+
+    .note {
+      margin-top: 2mm;
+      color: var(--muted);
+      font-size: 8.2pt;
+    }
+
+    .metric {
+      color: var(--accent);
+      font-weight: 850;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.5pt;
+      text-align: right;
+    }
+
+    @media print {
+      html,
+      body {
+        width: var(--paper-width);
+        background: #fff;
+      }
+
+      .document {
+        width: var(--paper-width);
+      }
+
+      .page {
+        min-height: var(--paper-height);
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="document">
+    <article class="page">
+      <div class="page-mark">정시원 경력기술서 1 / 3</div>
+      <header class="doc-header">
+        <div>
+          <p class="doc-label">Career Description</p>
+          <h1>정시원 경력기술서</h1>
+          <p class="headline">운영 중인 서비스의 병목 분석, 레거시 개선, 장애 대응을 중심으로 백엔드 시스템 안정성과 개발 품질을 개선했습니다.</p>
+        </div>
+        <p class="profile">Software Engineer<br>official.siwony@gmail.com</p>
+      </header>
+
+      <section>
+        <h2>Work Experience</h2>
+        <div class="company">
+          <div>
+            <p class="company-name">네오컨버전스</p>
+            <p class="period">2024.12 ~ 현재</p>
+          </div>
+          <p class="company-desc">
+            방송통신/디지털 미디어 솔루션 기업에서 SK Broadband 콘텐츠 관리 솔루션(NCDS)과 셋톱박스 기반
+            사내방송/매장 광고 솔루션(On-Air/On-Ad) 개발 및 유지보수를 수행하고 있습니다.
+          </p>
+        </div>
+
+        <div class="two-blocks">
+          <div class="block">
+            <p class="block-title">담당 역할</p>
+            <ul>
+              <li>온프레미스 환경 웹서버 개발 및 유지보수</li>
+              <li>개발 생산성/품질 체계 도입 및 운영: GitLab, SonarQube</li>
+              <li>모니터링 리포트 자동화: Scouter 기반 리포트 자동화</li>
+            </ul>
+          </div>
+          <div class="block">
+            <p class="block-title">대표 성과</p>
+            <ul>
+              <li>CIFS 마운트 경로를 공인망(1Gbps)에서 사설망(10Gbps)으로 전환하여 파일 처리 성능 약 <span class="metric">2~3배 개선</span></li>
+              <li>Spring Framework 4.1에서 5.3.39로 업그레이드 수행</li>
+              <li>GitLab 도입 및 3개 프로젝트 마이그레이션, SonarQube 도입으로 취약점 조기 탐지 체계 구축</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>셋톱 관리 솔루션(On-Air/Ad) 개발 및 유지보수</h3>
+        <div class="project">
+          <p class="project-title">업무 범위</p>
+          <ul>
+            <li>셋톱박스 관리, 편성/운영 기능 개발 및 유지보수</li>
+            <li>Spring Framework 4.1에서 5.3.39로 업그레이드 수행</li>
+            <li>DB 성능 튜닝 및 트랜잭션 도입으로 데이터 일관성과 장애 리스크 개선</li>
+            <li>Scouter 기반 CPU, Memory, Disk 리포트 자동화 구축</li>
+          </ul>
+        </div>
+        <div class="project">
+          <p class="project-title">DevEx / 품질 체계 구축</p>
+          <ul>
+            <li>기존 git server에서 GitLab으로 3개 프로젝트를 마이그레이션하고 코드 리뷰 프로세스를 정착시켰습니다.</li>
+            <li>SonarQube를 도입하여 Path Traversal, SQL Injection 등 보안/품질 이슈를 개발 단계에서 사전 탐지하는 체계를 마련했습니다.</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer>정시원 · Career Description</footer>
+    </article>
+
+    <article class="page">
+      <div class="page-mark">정시원 경력기술서 2 / 3</div>
+      <section>
+        <h2>Work Experience</h2>
+        <h3>SK Broadband 콘텐츠 관리 솔루션 NCDS 개발 및 유지보수</h3>
+        <div class="project">
+          <p class="project-title">업무 범위</p>
+          <ul>
+            <li>콘텐츠 파일 처리 기능 개발 및 유지보수: 파일 검사, 전처리, 검수 워크플로우</li>
+            <li>Gradle 도입 및 모노레포 적용으로 빌드/프로젝트 구성을 개선했습니다.</li>
+            <li>ClamAV 바이러스 검사 솔루션을 연동했습니다.</li>
+          </ul>
+        </div>
+        <div class="project">
+          <p class="project-title">핵심 이슈 해결: CIFS 마운트 병목 개선</p>
+          <ul>
+            <li>대용량 미디어 파일 처리 시 CIFS 스토리지 접근 구간에서 지연이 지속 발생했습니다.</li>
+            <li>기존 구성이 공인망(1Gbps) 경로를 경유하고 있었고, 병목이 애플리케이션 로직이 아닌 네트워크 경로에 있다고 판단했습니다.</li>
+            <li>고객사와 협의하여 private IP를 확보하고 마운트를 사설망(10Gbps) 경로로 전환했습니다.</li>
+            <li>파일 처리 성능이 약 <span class="metric">2~3배 개선</span>되었고, 납기 리스크가 완화되었습니다.</li>
+          </ul>
+          <p class="note">코드 최적화 이전에 인프라 병목을 먼저 제거하는 접근으로 팀 내 재발 방지에 기여했습니다.</p>
+        </div>
+      </section>
+
+      <section>
+        <div class="company">
+          <div>
+            <p class="company-name">HTBeyond</p>
+            <p class="period">2022.09 ~ 2024.08</p>
+          </div>
+          <p class="company-desc">
+            아파트 통합 주거 솔루션(B2C 입주민 앱 + B2B 관리사무소 운영툴)을 개발했습니다. 클라우드 API 서버(MID)와
+            현장 기기 연동 서버(RED)를 모두 개발·운영하며 외부 시스템 연동 및 실시간 장애 대응·성능 개선을 수행했습니다.
+          </p>
+        </div>
+
+        <div class="two-blocks">
+          <div class="block">
+            <p class="block-title">담당 역할</p>
+            <ul>
+              <li>클라우드 WAS(MID) 개발/유지보수: 웹/앱 API, 외부 시스템 연동</li>
+              <li>현장 기기 통신 WAS(RED) 개발/유지보수: 스피드게이트, 키오스크, 골프 타석기 등 실물 장비 통신</li>
+              <li>실시간 장애 대응 및 핫픽스, APM 기반 서비스 모니터링 및 성능 개선</li>
+            </ul>
+          </div>
+          <div class="block">
+            <p class="block-title">대표 성과</p>
+            <ul>
+              <li>엘리베이터 콜 시스템 스레드 누수 안정화: 최대 2,000개 이상에서 약 200개 수준으로 감소</li>
+              <li>복수 CRT 감시반 프로토콜 연동 수행</li>
+              <li>홈넷(코콤) API 연동 아키텍처 설계 및 구현</li>
+              <li>전기차 충전 도메인 API 설계/구현 및 현장↔서버 통신 구성</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer>정시원 · Career Description</footer>
+    </article>
+
+    <article class="page">
+      <div class="page-mark">정시원 경력기술서 3 / 3</div>
+      <section>
+        <h2>Work Experience</h2>
+        <h3>엘리베이터 콜 연동 시스템(MID) 개발 및 운영 안정화</h3>
+        <div class="project">
+          <p class="project-title">업무 범위</p>
+          <ul>
+            <li>CRT 감시반과의 TCP/IP 통신 기반 엘리베이터 호출 기능 구현 및 유지보수</li>
+            <li>복수 CRT 감시반(벤더/현장) 프로토콜 요구사항 분석 및 연동 구현</li>
+            <li>운영 중 장애 대응 및 핫픽스</li>
+          </ul>
+        </div>
+        <div class="project">
+          <p class="project-title">핵심 성과: 스레드 누수 개선</p>
+          <ul>
+            <li>운영 중 서버 스레드 수가 최대 2,000개 이상까지 증가하여 장애 리스크가 발생했습니다.</li>
+            <li>APM 및 운영 지표 기반으로 스레드 증가 패턴을 확인하고, Netty NioEventLoopGroup 구조를 최적화했습니다.</li>
+            <li>스레드 수가 약 <span class="metric">200개 수준</span>으로 안정화되었고, 서버 자원 사용량 및 처리량이 개선되었습니다.</li>
+          </ul>
+          <p class="note">
+            참고:
+            <a href="https://blog.siwony.xyz/devops/2024/03/22/1%EC%B0%A8-%EA%B0%9C%EC%84%A0-%EC%8A%A4%EB%9E%98%EB%93%9C%EA%B0%80-2000%EA%B0%9C-%EC%9D%B4%EC%83%81-%ED%8A%80%EB%8A%94-%ED%98%84%EC%83%81/">1차 개선</a>,
+            <a href="https://blog.siwony.xyz/devops/2024/07/06/2%EC%B0%A8-%EA%B0%9C%EC%84%A0-%EC%95%84%EB%AC%B4%EB%A6%AC-%EA%B7%B8%EB%9E%98%EB%8F%84-%EC%8A%A4%EB%9E%98%EB%93%9C-700%EA%B0%9C%EB%8A%94-%EB%A7%8E%EC%9D%80%EA%B1%B0-%EC%95%84%EB%8B%8C%EA%B0%80/">2차 개선</a>
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h3>홈넷 연동 아키텍처 설계 및 구현(MID)</h3>
+        <div class="project">
+          <p class="project-title">업무 범위</p>
+          <ul>
+            <li>홈넷사(코콤 등) API 연동 및 통합 아키텍처 설계·구현</li>
+            <li>홈넷사별 상이한 API를 앱에서 일관되게 사용할 수 있도록 공통 인터페이스를 추상화했습니다.</li>
+            <li>Kafka 기반 홈넷 기기 상태 및 편의 서비스 알림 데이터를 서빙했습니다.</li>
+          </ul>
+        </div>
+        <div class="project">
+          <p class="project-title">성과 포인트</p>
+          <ul>
+            <li>벤더별 API를 내부 표준 형태로 매핑하여 제품 기능으로 통합했습니다.</li>
+            <li>외부 의존성(홈넷사 API 변경/제약)에 대응 가능한 구조로 설계했습니다.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h3>전기차 충전(MID) 및 사우나 키오스크(RED) 개발</h3>
+        <div class="two-blocks">
+          <div class="block">
+            <p class="project-title">전기차 충전 - MID</p>
+            <ul>
+              <li>관리사무소 운영툴 API를 개발했습니다.</li>
+              <li>입주민 앱 API를 설계/개발했습니다: 충전기 현황 API, 충전 현황 푸시 알림 기능.</li>
+              <li>아파트 현장 서버↔충전기 서버 간 통신을 구성하고, 충전기 상태 수집 및 이력 적재 API를 설계/개발했습니다.</li>
+              <li>B2B 운영툴과 B2C 앱을 동시에 지원하는 백엔드를 설계하며, 현장/서버/앱 3자 구조에서 데이터 정합성을 고려했습니다.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <p class="project-title">사우나 키오스크 - RED</p>
+            <ul>
+              <li>키오스크 모니터링 기능을 개발했습니다: 운영 상태 확인, 장애 감지.</li>
+              <li>디지털 락커/신발장 발권 시스템을 개발했습니다.</li>
+              <li>클라우드 서버로 발권 이력 및 기기 데이터 전송 기능을 개발했습니다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer>정시원 · Career Description</footer>
+    </article>
+  </main>
+</body>
+</html>

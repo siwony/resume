@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>정시원 이력서</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    :root {
+      --paper-width: 210mm;
+      --paper-height: 297mm;
+      --page-x: 16mm;
+      --page-y: 15mm;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #dadce0;
+      --soft-line: #eceff3;
+      --accent: #1f5fbf;
+      --accent-soft: #edf4ff;
+      --title: #111827;
+      --page-bg: #eef1f5;
+      --font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      --link-border: rgba(31, 95, 191, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: var(--font-family);
+      font-size: 9.6pt;
+      line-height: 1.55;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 0.2mm solid var(--link-border);
+    }
+
+    .document {
+      width: var(--paper-width);
+      margin: 0 auto;
+    }
+
+    .page {
+      position: relative;
+      width: var(--paper-width);
+      min-height: var(--paper-height);
+      margin: 10mm auto;
+      padding: var(--page-y) var(--page-x);
+      background: #fff;
+      box-shadow: 0 8mm 24mm rgba(15, 23, 42, 0.14);
+      break-after: page;
+      page-break-after: always;
+    }
+
+    body[data-preview="true"] .page {
+      height: var(--paper-height);
+      overflow: visible;
+    }
+
+    body[data-preview="true"] .page.is-overflowing {
+      outline: 0.8mm solid #d92d20;
+      outline-offset: -0.8mm;
+    }
+
+    .page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .page-mark {
+      position: absolute;
+      top: 8mm;
+      right: var(--page-x);
+      color: var(--muted);
+      font-size: 8.2pt;
+    }
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8.2pt;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 34mm minmax(0, 1fr) 57mm;
+      gap: 7mm;
+      align-items: center;
+      padding-bottom: 8mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 2mm;
+      color: var(--title);
+      font-size: 24pt;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .role {
+      margin-top: 3mm;
+      color: var(--accent);
+      font-size: 12.5pt;
+      font-weight: 700;
+    }
+
+    .intro {
+      margin-top: 3mm;
+      color: #343a46;
+      font-size: 10pt;
+    }
+
+    .self-introduction {
+      margin-top: 7mm;
+      padding-bottom: 6mm;
+      border-bottom: 0.25mm solid var(--soft-line);
+    }
+
+    .self-introduction .intro {
+      max-width: 170mm;
+    }
+
+    .photo-frame {
+      width: 34mm;
+      height: 34mm;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #eaf2f5;
+    }
+
+    .profile-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 2.4mm;
+      align-content: start;
+    }
+
+    .contact-item {
+      display: grid;
+      grid-template-columns: 18mm minmax(0, 1fr);
+      gap: 3mm;
+      align-items: baseline;
+      font-size: 8.9pt;
+    }
+
+    .contact-item dt {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .contact-item dd {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    section {
+      margin-top: 8mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      color: var(--title);
+      font-size: 13.5pt;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    h2::before {
+      content: "";
+      display: block;
+      width: 3mm;
+      height: 3mm;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .summary-text {
+      margin-top: 3.2mm;
+      color: #3c4048;
+      font-size: 10.2pt;
+    }
+
+    .achievement-list {
+      display: grid;
+      gap: 4.5mm;
+      margin: 4mm 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: achievement;
+    }
+
+    .achievement-list li {
+      display: grid;
+      grid-template-columns: 9mm minmax(0, 1fr);
+      gap: 3.5mm;
+      padding: 3.6mm 0 0;
+      border-top: 0.25mm solid var(--soft-line);
+      counter-increment: achievement;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .achievement-list li::before {
+      content: counter(achievement);
+      display: grid;
+      width: 7mm;
+      height: 7mm;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 8.6pt;
+      font-weight: 800;
+    }
+
+    .achievement-list strong {
+      display: block;
+      margin-bottom: 1.2mm;
+      color: var(--title);
+      font-size: 10.4pt;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7mm;
+      align-items: start;
+    }
+
+    .item-stack {
+      display: grid;
+      gap: 4.2mm;
+      margin-top: 4mm;
+    }
+
+    .item {
+      padding-top: 3.2mm;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .item-title {
+      color: var(--title);
+      font-size: 10.2pt;
+      font-weight: 800;
+    }
+
+    .item-meta {
+      margin-top: 0.8mm;
+      color: var(--muted);
+      font-size: 8.5pt;
+      font-weight: 700;
+    }
+
+    .item p {
+      margin-top: 1.5mm;
+      color: #3c4048;
+    }
+
+    .certificate-list,
+    .prize-list {
+      margin: 4mm 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .certificate-list li,
+    .prize-list li {
+      display: grid;
+      grid-template-columns: 26mm minmax(0, 1fr);
+      gap: 3.5mm;
+      padding: 2.6mm 0;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 8.6pt;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.6pt;
+      text-align: right;
+    }
+    @media print {
+      html,
+      body {
+        width: var(--paper-width);
+        background: #fff;
+      }
+
+      .document {
+        width: var(--paper-width);
+      }
+
+      .page {
+        min-height: var(--paper-height);
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="document">
+    <article class="page">
+      <div class="page-mark">정시원 이력서 1 / 2</div>
+      <header class="hero">
+        <div class="photo-frame" aria-label="프로필 사진">
+          <img class="profile-photo" src="profile-photo.png" alt="정시원 프로필 사진">
+        </div>
+        <div>
+          <p class="doc-label">Resume</p>
+          <h1>정시원</h1>
+          <p class="role">백엔드 엔지니어</p>
+        </div>
+        <dl class="contact-list" aria-label="연락처">
+          <div class="contact-item">
+            <dt>Email</dt>
+            <dd><a href="mailto:official.siwony@gmail.com">official.siwony@gmail.com</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>GitHub</dt>
+            <dd><a href="https://github.com/siwony">github.com/siwony</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Blog</dt>
+            <dd><a href="https://blog.siwony.xyz/">blog.siwony.xyz</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Phone</dt>
+            <dd>010-3629-3839</dd>
+          </div>
+        </dl>
+      </header>
+      <section class="self-introduction">
+        <h2>자기소개</h2>
+        <p class="intro">안녕하세요. 3년차 백엔드 엔지니어 정시원입니다.<br><br>Kotlin/Java 기반 Spring Boot 애플리케이션을 중심으로 온프레미스 및 클라우드 환경에서 백엔드 개발을 수행해왔습니다. 소켓 통신 기반 연동, HTTP API 개발, 운영 자동화, 레거시 개선, 장애 대응 등 서비스 운영과 밀접한 업무를 경험했습니다.<br><br>저는 단순 구현보다 운영 과정에서 발생하는 병목과 비효율을 줄이는 데 관심이 많습니다. 스토리지 네트워크 경로 개선으로 파일 처리 성능을 약 2~3배 향상시키고, 슬로우 쿼리 튜닝으로 조회 응답 시간을 3초에서 0.1초 수준으로 단축한 경험이 있습니다. 또한 APM 기반 서버 메트릭 보고 업무를 자동화하여 매일 약 1시간 걸리던 작업을 약 10분 수준으로 줄였습니다.<br><br>운영 환경을 이해하고, 레거시를 점진적으로 개선하며, 유지보수 가능한 구조를 설계하는 백엔드 엔지니어로 성장하고 있습니다.</p>
+      </section>
+      <section>
+        <h2>대표 경험</h2>
+        <ol class="achievement-list">
+          <li>
+            <div>
+              <strong>NCDS 스토리지 병목 개선 - 네오컨버전스</strong>
+              <p>CIFS 마운트 경로를 공인망(1Gbps)에서 사설망(10Gbps)으로 전환하여 파일 처리 성능을 약 2~3배 개선했습니다. 슬로우 쿼리 튜닝으로 조회 응답 시간을 3초에서 0.1초로 단축했습니다.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>On-Air/Ad 레거시 마이그레이션 - 네오컨버전스</strong>
+              <p>Spring Framework 4.1에서 5.3.39로 업그레이드하고 종속성 충돌을 해결했습니다. Scouter 기반 서버 메트릭(CPU, Memory, Storage) 자동 리포트 체계를 구축했습니다.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>엘리베이터 콜 시스템 안정화 - HTBeyond</strong>
+              <p>TCP/IP 소켓 통신에서 Netty NioEventLoopGroup 구조를 최적화하여, 최대 2,000개 이상 증가하던 스레드를 약 200개 수준으로 안정화했습니다.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>홈넷 연동 아키텍처 설계 및 구현 - HTBeyond</strong>
+              <p>기존 단일 홈넷사로 연동된 서비스를 여러 홈넷사가 연동 가능한 아키텍처로 설계·개발했습니다. 하위 호환성을 유지하면서 여러 홈넷사를 연동할 수 있도록 코드 레벨의 추상화를 진행했습니다.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+      <footer>정시원 · 백엔드 엔지니어</footer>
+    </article>
+    <article class="page">
+      <div class="page-mark">정시원 이력서 2 / 2</div>
+      <section>
+        <h2>Continuous Learning</h2>
+        <p class="summary-text">사내에서 업무와 병행했던 기술 공유 이력입니다.</p>
+        <div class="item-stack">
+          <div class="item">
+            <p class="item-title">VO 사실과 오해</p>
+            <p>DDD의 VO와 Controller 계층에서 사용하는 VO 객체를 혼용하지 말자는 취지로 발표한 내용입니다. DDD에서의 VO와 J2EE에서 시작된 VO에 관한 내용을 담고 있습니다.</p>
+            
+          </div>
+          <div class="item">
+            <p class="item-title">유닛 테스트 책 스터디</p>
+            <p>블라디미르 코리코프 저자의 <a href="https://search.kyobobook.co.kr/search?keyword=%EB%B8%94%EB%9D%BC%EB%94%94%EB%AF%B8%EB%A5%B4%20%EC%BD%94%EB%A6%AC%EC%BD%94%ED%94%84&amp;chrcCode=2003693201">유닛 테스트</a>를 기반으로 실무 적용 스터디를 진행했습니다. Parameterized 테스트를 통해 장황했던 테스트를 개선한 경험이 있습니다.</p>
+            <p class="item-meta"><a href="https://github.com/siwony/TIL/tree/main/Book/%EC%9C%A0%EB%8B%9B%ED%85%8C%EC%8A%A4%ED%8A%B8">스터디 정리 자료</a></p>
+          </div>
+        </div>
+      </section>
+      <section class="two-column">
+        <div>
+          <h2>Certificates</h2>
+          <ul class="certificate-list">
+            <li>
+              <span class="date">2024-08</span>
+              <span><a href="https://www.credly.com/badges/a2320f12-e8cf-4617-b1f4-0fe00150cc5d/linked_in_profile">AWS Certified Developer - Associate (DVA-C02)</a></span>
+            </li>
+            <li>
+              <span class="date">2022-04</span>
+              <span>SQL 개발자 - 제45회</span>
+            </li>
+            <li>
+              <span class="date">2021-12</span>
+              <span>정보처리기능사</span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2>Prize</h2>
+          <ul class="prize-list">
+            <li>
+              <span class="date">2020-11<br>~ 2020-12</span>
+              <span><a href="https://www.jungle.co.kr/contest/202514">2020 인공지능(AI) 문제 해결 아이디어 공모전</a> 최우수상</span>
+            </li>
+            <li>
+              <span class="date">2020-09<br>~ 2020-11</span>
+              <span><a href="https://www.kdn.com/event.kdn?mid=a10111060100&amp;act=view&amp;event_seq=20&amp;event_status=I">2020 한전 KDN 빛가람 에너지밸리 소프트웨어 작품 경진대회</a> 장려상</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer>정시원 · Software Engineer</footer>
+    </article>
+  </main>
+</body>
+</html>

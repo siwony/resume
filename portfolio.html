@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정시원 포트폴리오</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    :root {
+      --paper-width: 210mm;
+      --paper-height: 297mm;
+      --page-x: 15mm;
+      --page-y: 14mm;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #d8dde5;
+      --soft-line: #edf0f4;
+      --accent: #17675a;
+      --accent-soft: #eaf7f4;
+      --title: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: #eef1f5;
+      color: var(--ink);
+      font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      font-size: 8.8pt;
+      line-height: 1.45;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 0.2mm solid rgba(23, 103, 90, 0.35);
+    }
+
+    .document {
+      width: var(--paper-width);
+      margin: 0 auto;
+    }
+
+    .page {
+      position: relative;
+      width: var(--paper-width);
+      min-height: var(--paper-height);
+      margin: 10mm auto;
+      padding: var(--page-y) var(--page-x);
+      background: #fff;
+      box-shadow: 0 8mm 24mm rgba(15, 23, 42, 0.14);
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .page-mark {
+      position: absolute;
+      top: 8mm;
+      right: var(--page-x);
+      color: var(--muted);
+      font-size: 7.8pt;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .doc-header {
+      display: grid;
+      grid-template-columns: 1fr 42mm;
+      gap: 8mm;
+      padding-bottom: 5.5mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8pt;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin-top: 1.6mm;
+      color: var(--title);
+      font-size: 22pt;
+      line-height: 1.1;
+      font-weight: 850;
+    }
+
+    .headline {
+      margin-top: 2.4mm;
+      color: #343a46;
+      font-size: 9.7pt;
+    }
+
+    .contact {
+      align-self: end;
+      color: var(--muted);
+      font-size: 8.2pt;
+      text-align: right;
+    }
+
+    .project {
+      margin-top: 6mm;
+      padding-top: 4.5mm;
+      border-top: 0.28mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .project:first-of-type {
+      border-top: 0;
+    }
+
+    .project-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 5mm;
+      align-items: start;
+    }
+
+    h2 {
+      color: var(--title);
+      font-size: 13.2pt;
+      line-height: 1.18;
+      font-weight: 850;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 2mm;
+      max-width: 68mm;
+      font-size: 8.2pt;
+      font-weight: 800;
+    }
+
+    .period {
+      margin-top: 1.5mm;
+      color: var(--muted);
+      font-size: 8.2pt;
+      font-weight: 800;
+    }
+
+    .summary {
+      margin-top: 2.5mm;
+      color: #343a46;
+      font-size: 9.2pt;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 3.6mm;
+      align-items: start;
+    }
+
+    .block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h3 {
+      color: var(--accent);
+      font-size: 9.2pt;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    ul {
+      margin: 1.7mm 0 0;
+      padding-left: 4.2mm;
+    }
+
+    li {
+      margin-top: 0.9mm;
+    }
+
+    .effect {
+      margin-top: 3.2mm;
+      padding: 3mm;
+      background: var(--accent-soft);
+      border-left: 0.8mm solid var(--accent);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .effect p + p {
+      margin-top: 1mm;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.5pt;
+      text-align: right;
+    }
+
+    @media print {
+      html,
+      body {
+        width: var(--paper-width);
+        background: #fff;
+      }
+
+      .document {
+        width: var(--paper-width);
+      }
+
+      .page {
+        min-height: var(--paper-height);
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="document">
+    <article class="page">
+      <div class="page-mark">정시원 포트폴리오 1 / 2</div>
+      <header class="doc-header">
+        <div>
+          <p class="doc-label">Portfolio</p>
+          <h1>정시원 포트폴리오</h1>
+          <p class="headline">개인 서비스와 팀 프로젝트를 통해 백엔드 설계, 인증, 배포, 알림, 관리자 기능을 구현했습니다.</p>
+        </div>
+        <p class="contact">Software Engineer<br><a href="https://blog.siwony.xyz/">blog.siwony.xyz</a></p>
+      </header>
+
+      <section class="project">
+        <div class="project-head">
+          <div>
+            <h2>my-blog</h2>
+            <p class="period">서비스 기간: 2025.12 ~ ing · 개발 기간: 2025.07 ~ ing</p>
+          </div>
+          <div class="links">
+            <a href="https://blog.siwony.xyz/">URL</a>
+          </div>
+        </div>
+        <p class="summary">바이브코딩으로 만든 간단한 마크다운 기반 개인 개발 블로그입니다.</p>
+        <div class="grid">
+          <div class="block">
+            <h3>기대 효과</h3>
+            <ul>
+              <li>개발 시 공부한 내용과 나만의 인사이트를 글로 남길 수 있습니다.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>담당 업무</h3>
+            <ul>
+              <li>CloudFront를 통한 정적 웹사이트 배포</li>
+              <li>프롬프팅을 통한 전반적인 기능 개발</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="project">
+        <div class="project-head">
+          <div>
+            <h2>HiRecruit</h2>
+            <p class="period">개발 기간: 2022.03 ~ 2022.05 · 서비스 기간: 2022.05 ~ 2022.08</p>
+          </div>
+          <div class="links">
+            <a href="https://github.com/themoment-team/HiRecruit-server">GitHub</a>
+          </div>
+        </div>
+        <p class="summary">IT 직군 취업 준비생을 위한 쉽고 빠른 멘토링을 제공하는 프로젝트입니다.</p>
+        <div class="grid">
+          <div class="block">
+            <h3>프로젝트 설명</h3>
+            <ul>
+              <li>취업자는 프로필을 등록할 수 있습니다.</li>
+              <li>취업 준비생은 등록된 취업자에게 멘토 신청을 할 수 있습니다.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>담당 업무</h3>
+            <ul>
+              <li><a href="https://i.imgur.com/btGEM5I.png">ERD 설계</a></li>
+              <li>Spring Security OAuth2 Client를 이용한 GitHub 소셜 인증 구현</li>
+              <li>재직자 프로필 등록/수정 기능 구현</li>
+            </ul>
+          </div>
+        </div>
+        <div class="effect">
+          <h3>기대 효과</h3>
+          <p>취업 준비생의 편리한 멘토링 신청을 지원합니다.</p>
+          <p>학교 입장에서 강연과 같은 강사의 인재풀 확보에 도움이 됩니다.</p>
+          <p>멘토링을 받은 재학생들의 졸업 후 진로 방향 설정에 도움이 됩니다.</p>
+        </div>
+      </section>
+
+      <footer>정시원 · Portfolio</footer>
+    </article>
+
+    <article class="page">
+      <div class="page-mark">정시원 포트폴리오 2 / 2</div>
+      <section class="project">
+        <div class="project-head">
+          <div>
+            <h2>every-moment</h2>
+            <p class="period">서비스 기간: 2021.06 ~ 2022.01 · 개발 기간: 2021.02 ~ 2021.06</p>
+          </div>
+          <div class="links">
+            <a href="https://github.com/themoment-team/K2-server">GitHub</a>
+            <a href="https://github.com/themoment-team/the_moment_about/tree/main">About</a>
+            <a href="https://toss.im/every-moment">Reference</a>
+          </div>
+        </div>
+        <p class="summary">
+          toss의 “금융이 불편한 순간”을 모티브로 개발한, 학교가 개선되기 위해 학생 관점에서 느끼는 불편한 순간을
+          기록하는 공간입니다.
+        </p>
+        <div class="grid">
+          <div class="block">
+            <h3>프로젝트 설명</h3>
+            <ul>
+              <li>학생들의 불편한 순간을 작성하고, 이를 교직원이 조회할 수 있도록 하는 공간입니다.</li>
+              <li>불편함에 대한 공감 기능과 공감 상위 10개의 불편함 조회 기능을 제공합니다.</li>
+              <li>학교 측에서 해결한 불편함을 게시하고 조회할 수 있는 기능을 제공합니다.</li>
+              <li>2021년 11월 기준 고유 방문자 880명을 기록했습니다.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>담당 업무</h3>
+            <ul>
+              <li>불편한 순간에 답변을 달고 개선 사항을 알려주는 관리자(Admin) 기능 개발</li>
+              <li>로그인 유지를 위한 JWT Refresh Token 구현</li>
+              <li>불편한 순간을 공감 수 상위 10개로 보여주는 TOP 10 기능 구현</li>
+              <li>JPQL을 코드로 작성할 수 있는 이점을 얻기 위해 Querydsl 도입</li>
+            </ul>
+          </div>
+        </div>
+        <div class="effect">
+          <h3>기대 효과</h3>
+          <p>학생과 학교에 대한 소통 창구를 제공합니다.</p>
+          <p>여러 학생의 의견을 종합하여 더 나은 학교를 만들어 나갈 수 있습니다.</p>
+        </div>
+      </section>
+
+      <section class="project">
+        <div class="project-head">
+          <div>
+            <h2>EZY</h2>
+            <p class="period">개발 기간: 2021.04 ~ 2021.12</p>
+          </div>
+          <div class="links">
+            <span>GitHub / About</span>
+          </div>
+        </div>
+        <p class="summary">
+          더 가치 있는 삶을 만들기 위한 Personal Todo List입니다. 개인 일정과 팀 일정, 재미를 위한 심부름 기능이 존재합니다.
+        </p>
+        <div class="grid">
+          <div class="block">
+            <h3>기대 효과</h3>
+            <ul>
+              <li>개인의 효율적인 시간 관리</li>
+              <li>심부름 기능을 이용한 재미 제공</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>담당 업무</h3>
+            <ul>
+              <li>ERD 설계</li>
+              <li>전반적인 Global Exception Handling 로직 작성</li>
+              <li>FCM 연동 및 push 알림 로직 설계</li>
+              <li>심부름 기능 개발</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer>정시원 · Portfolio</footer>
+    </article>
+  </main>
+</body>
+</html>

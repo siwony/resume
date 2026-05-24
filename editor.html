@@ -1,0 +1,1948 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정시원 문서 에디터</title>
+  <link rel="icon" href="data:,">
+  <script src="editor-data.js"></script>
+  <style>
+    :root {
+      --app-bg: #f3f5f8;
+      --panel: #ffffff;
+      --panel-alt: #f8fafc;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --line-strong: #bcc7d6;
+      --accent: #2457a6;
+      --accent-soft: #edf4ff;
+      --danger: #b42318;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: var(--app-bg);
+      color: var(--text);
+      font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: baseline;
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .actions button,
+    .tab-button {
+      min-height: 34px;
+      padding: 7px 11px;
+      font-weight: 700;
+    }
+
+    .actions .primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .actions .primary:hover {
+      background: #1c488c;
+      color: #fff;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.75fr) minmax(380px, 1.08fr) minmax(560px, 1.45fr);
+      gap: 14px;
+      min-height: 0;
+      padding: 14px;
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .panel-body {
+      padding: 12px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-alt);
+    }
+
+    .tab-button {
+      width: 100%;
+      border-color: transparent;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .tab-button.active {
+      border-color: var(--accent);
+      background: #fff;
+      color: var(--accent);
+    }
+
+    .section-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .section-card + .section-card {
+      margin-top: 10px;
+    }
+
+    .section-title {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 11px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-alt);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .section-content {
+      display: grid;
+      gap: 10px;
+      padding: 11px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    .field input,
+    .field select {
+      min-height: 34px;
+      padding: 6px 8px;
+    }
+
+    .field input[type="color"] {
+      height: 34px;
+      padding: 3px;
+    }
+
+    .field textarea {
+      min-height: 82px;
+      resize: vertical;
+      padding: 7px 8px;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(36, 87, 166, 0.12);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .array-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .array-item {
+      display: grid;
+      gap: 8px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-alt);
+    }
+
+    .array-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .array-toolbar button,
+    .micro-button {
+      min-height: 28px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .danger {
+      border-color: #f0b8b4;
+      color: var(--danger);
+    }
+
+    .preview-panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .preview-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .overflow-status.warning {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 104px);
+      border: 0;
+      background: #eef1f5;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .panel,
+      .preview-frame {
+        min-height: 560px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>정시원 문서 에디터</h1>
+        <span class="status" id="saveStatus">준비됨</span>
+      </div>
+      <div class="actions">
+        <button type="button" data-action="export-json">JSON 내보내기</button>
+        <button type="button" data-action="import-json">JSON 가져오기</button>
+        <button type="button" data-action="export-current">현재 HTML</button>
+        <button class="primary" type="button" data-action="export-html">HTML 3종</button>
+        <button class="danger" type="button" data-action="reset">초기화</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel">
+        <div class="tabs" id="documentTabs"></div>
+        <div class="panel-header">
+          <h2>디자인 시스템</h2>
+        </div>
+        <div class="panel-body" id="designPanel"></div>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2 id="editorTitle">문서 편집</h2>
+        </div>
+        <div class="panel-body" id="editorPanel"></div>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel-header preview-meta">
+          <h2>미리보기</h2>
+          <span class="overflow-status" id="overflowStatus">A4</span>
+        </div>
+        <iframe class="preview-frame" id="previewFrame" title="문서 미리보기"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <input class="hidden" id="jsonImportInput" type="file" accept="application/json,.json">
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "resume-editor:v1";
+      const DOC_KEYS = ["resume", "portfolio", "career"];
+      const DEFAULT_DATA = window.RESUME_EDITOR_DEFAULT_DATA;
+      const defaultBaseHref = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1);
+
+      let activeDoc = "resume";
+      let state = loadState();
+      let saveTimer = 0;
+
+      const tabsEl = document.getElementById("documentTabs");
+      const designPanelEl = document.getElementById("designPanel");
+      const editorPanelEl = document.getElementById("editorPanel");
+      const editorTitleEl = document.getElementById("editorTitle");
+      const previewFrameEl = document.getElementById("previewFrame");
+      const saveStatusEl = document.getElementById("saveStatus");
+      const overflowStatusEl = document.getElementById("overflowStatus");
+      const importInputEl = document.getElementById("jsonImportInput");
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function mergeDefaults(base, saved) {
+        if (saved === undefined || saved === null) return clone(base);
+        if (Array.isArray(base)) return Array.isArray(saved) ? saved : clone(base);
+        if (typeof base === "object" && base) {
+          const output = {};
+          Object.keys(base).forEach((key) => {
+            output[key] = mergeDefaults(base[key], saved[key]);
+          });
+          Object.keys(saved || {}).forEach((key) => {
+            if (!(key in output)) output[key] = saved[key];
+          });
+          return output;
+        }
+        return saved;
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return clone(DEFAULT_DATA);
+          return mergeDefaults(DEFAULT_DATA, JSON.parse(raw));
+        } catch (error) {
+          console.warn(error);
+          return clone(DEFAULT_DATA);
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        window.clearTimeout(saveTimer);
+        saveStatusEl.textContent = "저장됨 " + new Date().toLocaleTimeString("ko-KR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        saveTimer = window.setTimeout(() => {
+          saveStatusEl.textContent = "브라우저 저장";
+        }, 1600);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function escapeAttr(value) {
+        return escapeHtml(value).replace(/`/g, "&#96;");
+      }
+
+      function sanitizeRichHtml(value) {
+        const normalized = String(value ?? "").replace(/\r\n/g, "\n").replace(/\n/g, "<br>");
+        const template = document.createElement("template");
+        template.innerHTML = normalized;
+        const allowed = new Set(["A", "BR", "STRONG", "SPAN"]);
+
+        function sanitizeNode(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            return document.createTextNode(node.textContent || "");
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            return document.createTextNode("");
+          }
+
+          const tag = node.tagName;
+          if (!allowed.has(tag)) {
+            const fragment = document.createDocumentFragment();
+            Array.from(node.childNodes).forEach((child) => fragment.appendChild(sanitizeNode(child)));
+            return fragment;
+          }
+
+          const element = document.createElement(tag.toLowerCase());
+          if (tag === "A") {
+            const href = safeHref(node.getAttribute("href") || "");
+            if (href) element.setAttribute("href", href);
+          }
+          if (tag === "SPAN" && node.classList.contains("metric")) {
+            element.className = "metric";
+          }
+          Array.from(node.childNodes).forEach((child) => element.appendChild(sanitizeNode(child)));
+          return element;
+        }
+
+        const output = document.createElement("template");
+        Array.from(template.content.childNodes).forEach((node) => output.content.appendChild(sanitizeNode(node)));
+        return output.innerHTML;
+      }
+
+      function safeHref(value) {
+        const raw = String(value ?? "").trim();
+        if (!raw) return "";
+        if (/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(raw)) {
+          try {
+            const parsed = new URL(raw);
+            return parsed.protocol === "https:" || parsed.protocol === "mailto:" ? raw : "";
+          } catch {
+            return "";
+          }
+        }
+        if (raw.startsWith("//")) return "";
+        return raw;
+      }
+
+      function pathParts(path) {
+        return String(path).split(".").map((part) => (/^\d+$/.test(part) ? Number(part) : part));
+      }
+
+      function getPath(root, path) {
+        return pathParts(path).reduce((target, part) => target?.[part], root);
+      }
+
+      function setPath(root, path, value) {
+        const parts = pathParts(path);
+        const last = parts.pop();
+        const target = parts.reduce((current, part) => current[part], root);
+        target[last] = value;
+      }
+
+      function renderAll() {
+        renderTabs();
+        renderDesignPanel();
+        renderEditor();
+        updatePreview();
+      }
+
+      function renderTabs() {
+        tabsEl.innerHTML = DOC_KEYS.map((key) => {
+          const label = state.design.documents[key].label;
+          return `<button type="button" class="tab-button ${key === activeDoc ? "active" : ""}" data-action="switch-doc" data-doc="${key}">${escapeHtml(label)}</button>`;
+        }).join("");
+      }
+
+      function renderDesignPanel() {
+        const common = state.design.common;
+        const doc = state.design.documents[activeDoc];
+        designPanelEl.innerHTML = [
+          card("공통 토큰", [
+            field("design.common.background", "배경", "color"),
+            field("design.common.ink", "본문색", "color"),
+            field("design.common.muted", "보조 텍스트", "color"),
+            field("design.common.title", "제목색", "color"),
+            field("design.common.fontFamily", "폰트 패밀리")
+          ].join("")),
+          card(`${doc.label} 토큰`, [
+            `<div class="field-grid">`,
+            field(`design.documents.${activeDoc}.accent`, "강조색", "color"),
+            field(`design.documents.${activeDoc}.accentSoft`, "강조 배경", "color"),
+            field(`design.documents.${activeDoc}.line`, "기준선", "color"),
+            field(`design.documents.${activeDoc}.softLine`, "보조선", "color"),
+            field(`design.documents.${activeDoc}.pageX`, "좌우 여백"),
+            field(`design.documents.${activeDoc}.pageY`, "상하 여백"),
+            field(`design.documents.${activeDoc}.fontSize`, "본문 크기"),
+            field(`design.documents.${activeDoc}.lineHeight`, "행간"),
+            `</div>`,
+            field(`design.documents.${activeDoc}.title`, "문서 제목"),
+            field(`design.documents.${activeDoc}.filename`, "내보내기 파일명")
+          ].join("")),
+          card("문서 컴포넌트", componentList(activeDoc))
+        ].join("");
+      }
+
+      function componentList(docKey) {
+        const components = {
+          resume: ["A4 page", "hero", "contact-list", "section heading", "achievement-list", "dated-list"],
+          portfolio: ["A4 page", "doc-header", "project", "project links", "two-column blocks", "effect box"],
+          career: ["A4 page", "doc-header", "company", "two-blocks", "project", "metric highlight"]
+        };
+        return `<div class="array-list">${components[docKey].map((name) => `<div class="array-item">${escapeHtml(name)}</div>`).join("")}</div>`;
+      }
+
+      function renderEditor() {
+        const doc = state.documents[activeDoc];
+        const meta = state.design.documents[activeDoc];
+        editorTitleEl.textContent = meta.label + " 편집";
+        const blocks = [
+          card("문서 설정", [
+            field(`design.documents.${activeDoc}.title`, "브라우저 제목"),
+            field(`design.documents.${activeDoc}.filename`, "HTML 파일명")
+          ].join(""))
+        ];
+
+        doc.pages.forEach((page, pageIndex) => {
+          const pagePath = `documents.${activeDoc}.pages.${pageIndex}`;
+          const content = [
+            `<div class="field-grid">`,
+            field(`${pagePath}.mark`, "페이지 표시"),
+            field(`${pagePath}.footer`, "푸터"),
+            `</div>`,
+            ...page.blocks.map((block, blockIndex) => {
+              return renderBlockEditor(block, `${pagePath}.blocks.${blockIndex}`, pagePath, blockIndex);
+            })
+          ];
+          if (activeDoc === "portfolio") {
+            content.push(`<button class="micro-button" type="button" data-action="add" data-path="${pagePath}.blocks" data-kind="portfolioProject">프로젝트 추가</button>`);
+          }
+          blocks.push(card(`페이지 ${pageIndex + 1}`, content.join("")));
+        });
+
+        editorPanelEl.innerHTML = blocks.join("");
+      }
+
+      function renderBlockEditor(block, path, pagePath, blockIndex) {
+        switch (block.type) {
+          case "resumeHero":
+            return card("프로필 헤더", [
+              field(`${path}.docLabel`, "라벨"),
+              field(`${path}.name`, "이름"),
+              field(`${path}.role`, "역할"),
+              field(`${path}.photoAlt`, "사진 대체 텍스트"),
+              renderArray(`${path}.contacts`, block.contacts, "contact")
+            ].join(""));
+          case "textSection":
+            return card(block.heading || "텍스트 섹션", [
+              field(`${path}.heading`, "제목"),
+              field(`${path}.body`, "본문", "textarea")
+            ].join(""));
+          case "achievements":
+            return card(block.heading || "대표 경험", [
+              field(`${path}.heading`, "제목"),
+              renderArray(`${path}.items`, block.items, "achievement")
+            ].join(""));
+          case "itemStack":
+            return card(block.heading || "항목 묶음", [
+              field(`${path}.heading`, "제목"),
+              field(`${path}.summary`, "요약"),
+              renderArray(`${path}.items`, block.items, "learningItem")
+            ].join(""));
+          case "datedListColumns":
+            return card("2열 날짜 목록", renderArray(`${path}.columns`, block.columns, "datedColumn"));
+          case "docHeader":
+            return card("문서 헤더", [
+              field(`${path}.docLabel`, "라벨"),
+              field(`${path}.title`, "제목"),
+              field(`${path}.headline`, "헤드라인", "textarea"),
+              field(`${path}.side`, "오른쪽 정보", "textarea")
+            ].join(""));
+          case "portfolioProject":
+            return renderPortfolioProjectEditor(block, path, pagePath, blockIndex);
+          case "careerSection":
+            return renderCareerSectionEditor(block, path);
+          default:
+            return "";
+        }
+      }
+
+      function renderPortfolioProjectEditor(block, path, pagePath, blockIndex) {
+        return card(`프로젝트 · ${block.title || "새 프로젝트"}`, [
+          controlsFor(pagePath + ".blocks", blockIndex, getPath(state, pagePath + ".blocks").length),
+          field(`${path}.title`, "프로젝트명"),
+          field(`${path}.period`, "기간"),
+          field(`${path}.summary`, "요약", "textarea"),
+          renderArray(`${path}.links`, block.links, "link"),
+          renderArray(`${path}.columns`, block.columns, "portfolioColumn"),
+          block.effect
+            ? card("기대 효과 박스", [
+                field(`${path}.effect.title`, "제목"),
+                renderArray(`${path}.effect.paragraphs`, block.effect.paragraphs, "effectParagraph"),
+                `<button class="micro-button danger" type="button" data-action="clear-effect" data-path="${path}.effect">효과 박스 삭제</button>`
+              ].join(""))
+            : `<button class="micro-button" type="button" data-action="set-effect" data-path="${path}.effect">효과 박스 추가</button>`
+        ].join(""));
+      }
+
+      function renderCareerSectionEditor(block, path) {
+        return card(block.subheading || block.heading || "경력 섹션", [
+          field(`${path}.heading`, "상위 제목"),
+          field(`${path}.subheading`, "섹션 제목"),
+          block.company
+            ? card("회사", [
+                field(`${path}.company.name`, "회사명"),
+                field(`${path}.company.period`, "기간"),
+                field(`${path}.company.description`, "설명", "textarea"),
+                `<button class="micro-button danger" type="button" data-action="clear-company" data-path="${path}.company">회사 삭제</button>`
+              ].join(""))
+            : `<button class="micro-button" type="button" data-action="set-company" data-path="${path}.company">회사 추가</button>`,
+          renderArray(`${path}.twoBlocks`, block.twoBlocks, "careerBlock"),
+          renderArray(`${path}.projects`, block.projects, "careerProject")
+        ].join(""));
+      }
+
+      function renderArray(path, items, kind) {
+        const safeItems = Array.isArray(items) ? items : [];
+        return card(arrayTitle(kind), [
+          `<div class="array-list">`,
+          safeItems.map((item, index) => {
+            return `<div class="array-item">${controlsFor(path, index, safeItems.length)}${renderArrayItem(path, item, index, kind)}</div>`;
+          }).join(""),
+          `</div>`,
+          `<button class="micro-button" type="button" data-action="add" data-path="${path}" data-kind="${kind}">추가</button>`
+        ].join(""));
+      }
+
+      function arrayTitle(kind) {
+        const titles = {
+          contact: "연락처",
+          achievement: "대표 경험 항목",
+          learningItem: "학습 항목",
+          datedColumn: "날짜 목록 열",
+          datedItem: "날짜 항목",
+          link: "링크",
+          portfolioColumn: "프로젝트 블록",
+          bullet: "목록 항목",
+          effectParagraph: "문장",
+          careerBlock: "2열 블록",
+          careerProject: "업무/성과 블록"
+        };
+        return titles[kind] || "항목";
+      }
+
+      function renderArrayItem(path, item, index, kind) {
+        const itemPath = `${path}.${index}`;
+        if (kind === "contact") {
+          return [
+            `<div class="field-grid">`,
+            field(`${itemPath}.label`, "라벨"),
+            field(`${itemPath}.text`, "텍스트"),
+            `</div>`,
+            field(`${itemPath}.href`, "링크")
+          ].join("");
+        }
+        if (kind === "achievement") {
+          return [
+            field(`${itemPath}.title`, "제목"),
+            field(`${itemPath}.body`, "본문", "textarea")
+          ].join("");
+        }
+        if (kind === "learningItem") {
+          return [
+            field(`${itemPath}.title`, "제목"),
+            field(`${itemPath}.body`, "본문", "textarea"),
+            field(`${itemPath}.meta`, "메타", "textarea")
+          ].join("");
+        }
+        if (kind === "datedColumn") {
+          return [
+            field(`${itemPath}.heading`, "열 제목"),
+            selectField(`${itemPath}.listClass`, "목록 스타일", [
+              ["certificate-list", "certificate-list"],
+              ["prize-list", "prize-list"]
+            ]),
+            renderArray(`${itemPath}.items`, item.items, "datedItem")
+          ].join("");
+        }
+        if (kind === "datedItem") {
+          return [
+            field(`${itemPath}.date`, "날짜"),
+            field(`${itemPath}.text`, "내용", "textarea")
+          ].join("");
+        }
+        if (kind === "link") {
+          return [
+            `<div class="field-grid">`,
+            field(`${itemPath}.label`, "라벨"),
+            field(`${itemPath}.href`, "URL"),
+            `</div>`
+          ].join("");
+        }
+        if (kind === "portfolioColumn") {
+          return [
+            field(`${itemPath}.title`, "블록 제목"),
+            renderArray(`${itemPath}.items`, item.items, "bullet")
+          ].join("");
+        }
+        if (kind === "bullet" || kind === "effectParagraph") {
+          return field(itemPath, kind === "bullet" ? "내용" : "문장", "textarea");
+        }
+        if (kind === "careerBlock") {
+          return [
+            field(`${itemPath}.title`, "제목"),
+            selectField(`${itemPath}.titleClass`, "제목 스타일", [
+              ["block-title", "block-title"],
+              ["project-title", "project-title"]
+            ]),
+            renderArray(`${itemPath}.items`, item.items, "bullet")
+          ].join("");
+        }
+        if (kind === "careerProject") {
+          return [
+            field(`${itemPath}.title`, "제목"),
+            renderArray(`${itemPath}.items`, item.items, "bullet"),
+            field(`${itemPath}.note`, "노트", "textarea")
+          ].join("");
+        }
+        return "";
+      }
+
+      function controlsFor(path, index, length) {
+        return `<div class="array-toolbar">
+          <button type="button" data-action="move-up" data-path="${escapeAttr(path)}" data-index="${index}" ${index === 0 ? "disabled" : ""}>위</button>
+          <button type="button" data-action="move-down" data-path="${escapeAttr(path)}" data-index="${index}" ${index >= length - 1 ? "disabled" : ""}>아래</button>
+          <button class="danger" type="button" data-action="remove" data-path="${escapeAttr(path)}" data-index="${index}">삭제</button>
+        </div>`;
+      }
+
+      function card(title, content) {
+        return `<section class="section-card">
+          <div class="section-title">${escapeHtml(title)}</div>
+          <div class="section-content">${content}</div>
+        </section>`;
+      }
+
+      function field(path, label, type = "text") {
+        const value = getPath(state, path) ?? "";
+        if (type === "textarea") {
+          return `<label class="field"><span>${escapeHtml(label)}</span><textarea data-path="${escapeAttr(path)}">${escapeHtml(value)}</textarea></label>`;
+        }
+        if (type === "color") {
+          const colorValue = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
+          return `<label class="field"><span>${escapeHtml(label)}</span><input type="color" data-path="${escapeAttr(path)}" value="${escapeAttr(colorValue)}"></label>`;
+        }
+        return `<label class="field"><span>${escapeHtml(label)}</span><input type="text" data-path="${escapeAttr(path)}" value="${escapeAttr(value)}"></label>`;
+      }
+
+      function selectField(path, label, options) {
+        const value = getPath(state, path) ?? "";
+        return `<label class="field"><span>${escapeHtml(label)}</span><select data-path="${escapeAttr(path)}">
+          ${options.map(([optionValue, optionLabel]) => `<option value="${escapeAttr(optionValue)}" ${optionValue === value ? "selected" : ""}>${escapeHtml(optionLabel)}</option>`).join("")}
+        </select></label>`;
+      }
+
+      function createDefault(kind) {
+        const defaults = {
+          contact: { label: "Label", text: "내용", href: "" },
+          achievement: { title: "새 대표 경험", body: "내용을 입력하세요." },
+          learningItem: { title: "새 항목", body: "내용을 입력하세요.", meta: "" },
+          datedColumn: { heading: "새 목록", listClass: "certificate-list", items: [] },
+          datedItem: { date: "YYYY-MM", text: "내용" },
+          link: { label: "Link", href: "https://" },
+          portfolioColumn: { title: "새 블록", items: ["새 항목"] },
+          bullet: "새 항목",
+          effectParagraph: "새 문장",
+          careerBlock: { title: "새 블록", titleClass: "block-title", items: ["새 항목"] },
+          careerProject: { title: "새 블록", items: ["새 항목"], note: "" },
+          portfolioProject: {
+            type: "portfolioProject",
+            title: "새 프로젝트",
+            period: "기간",
+            links: [],
+            summary: "요약을 입력하세요.",
+            columns: [
+              { title: "프로젝트 설명", items: ["새 항목"] },
+              { title: "담당 업무", items: ["새 항목"] }
+            ],
+            effect: null
+          }
+        };
+        return clone(defaults[kind] ?? "");
+      }
+
+      function renderFullHtml(docKey, options = {}) {
+        const meta = state.design.documents[docKey];
+        const base = options.preview ? `<base href="${escapeAttr(defaultBaseHref)}">` : "";
+        const previewAttr = options.preview ? " data-preview=\"true\"" : "";
+        return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  ${base}
+  <title>${escapeHtml(meta.title)}</title>
+  <style>
+${buildDocumentCss(docKey)}
+  </style>
+</head>
+<body${previewAttr}>
+${renderDocumentBody(docKey)}
+</body>
+</html>`;
+      }
+
+      function renderDocumentBody(docKey) {
+        const doc = state.documents[docKey];
+        return `  <main class="document">
+${doc.pages.map((page) => renderPage(docKey, page)).join("\n")}
+  </main>`;
+      }
+
+      function renderPage(docKey, page) {
+        const blocks = page.blocks.map((block) => renderBlock(docKey, block)).join("\n");
+        return `    <article class="page">
+      <div class="page-mark">${sanitizeRichHtml(page.mark)}</div>
+${blocks}
+      <footer>${sanitizeRichHtml(page.footer)}</footer>
+    </article>`;
+      }
+
+      function renderBlock(docKey, block) {
+        if (block.type === "resumeHero") return renderResumeHero(block);
+        if (block.type === "textSection") return renderTextSection(block);
+        if (block.type === "achievements") return renderAchievements(block);
+        if (block.type === "itemStack") return renderItemStack(block);
+        if (block.type === "datedListColumns") return renderDatedListColumns(block);
+        if (block.type === "docHeader") return renderDocHeader(block);
+        if (block.type === "portfolioProject") return renderPortfolioProject(block);
+        if (block.type === "careerSection") return renderCareerSection(block);
+        return "";
+      }
+
+      function renderResumeHero(block) {
+        const photo = state.assets.profilePhoto || "profile-photo.png";
+        return `      <header class="hero">
+        <div class="photo-frame" aria-label="프로필 사진">
+          <img class="profile-photo" src="${escapeAttr(photo)}" alt="${escapeAttr(block.photoAlt)}">
+        </div>
+        <div>
+          <p class="doc-label">${sanitizeRichHtml(block.docLabel)}</p>
+          <h1>${sanitizeRichHtml(block.name)}</h1>
+          <p class="role">${sanitizeRichHtml(block.role)}</p>
+        </div>
+        <dl class="contact-list" aria-label="연락처">
+${block.contacts.map(renderContact).join("\n")}
+        </dl>
+      </header>`;
+      }
+
+      function renderContact(item) {
+        const value = item.href ? `<a href="${escapeAttr(safeHref(item.href))}">${sanitizeRichHtml(item.text)}</a>` : sanitizeRichHtml(item.text);
+        return `          <div class="contact-item">
+            <dt>${sanitizeRichHtml(item.label)}</dt>
+            <dd>${value}</dd>
+          </div>`;
+      }
+
+      function renderTextSection(block) {
+        const className = block.className ? ` class="${escapeAttr(block.className)}"` : "";
+        const bodyClass = block.bodyClass ? ` class="${escapeAttr(block.bodyClass)}"` : "";
+        return `      <section${className}>
+        <h2>${sanitizeRichHtml(block.heading)}</h2>
+        <p${bodyClass}>${sanitizeRichHtml(block.body)}</p>
+      </section>`;
+      }
+
+      function renderAchievements(block) {
+        return `      <section>
+        <h2>${sanitizeRichHtml(block.heading)}</h2>
+        <ol class="achievement-list">
+${block.items.map((item) => `          <li>
+            <div>
+              <strong>${sanitizeRichHtml(item.title)}</strong>
+              <p>${sanitizeRichHtml(item.body)}</p>
+            </div>
+          </li>`).join("\n")}
+        </ol>
+      </section>`;
+      }
+
+      function renderItemStack(block) {
+        return `      <section>
+        <h2>${sanitizeRichHtml(block.heading)}</h2>
+        <p class="summary-text">${sanitizeRichHtml(block.summary)}</p>
+        <div class="item-stack">
+${block.items.map((item) => `          <div class="item">
+            <p class="item-title">${sanitizeRichHtml(item.title)}</p>
+            <p>${sanitizeRichHtml(item.body)}</p>
+            ${item.meta ? `<p class="item-meta">${sanitizeRichHtml(item.meta)}</p>` : ""}
+          </div>`).join("\n")}
+        </div>
+      </section>`;
+      }
+
+      function renderDatedListColumns(block) {
+        return `      <section class="two-column">
+${block.columns.map((column) => `        <div>
+          <h2>${sanitizeRichHtml(column.heading)}</h2>
+          <ul class="${escapeAttr(column.listClass)}">
+${column.items.map((item) => `            <li>
+              <span class="date">${sanitizeRichHtml(item.date)}</span>
+              <span>${sanitizeRichHtml(item.text)}</span>
+            </li>`).join("\n")}
+          </ul>
+        </div>`).join("\n")}
+      </section>`;
+      }
+
+      function renderDocHeader(block) {
+        return `      <header class="doc-header">
+        <div>
+          <p class="doc-label">${sanitizeRichHtml(block.docLabel)}</p>
+          <h1>${sanitizeRichHtml(block.title)}</h1>
+          <p class="headline">${sanitizeRichHtml(block.headline)}</p>
+        </div>
+        <p class="${escapeAttr(block.sideClass || "contact")}">${sanitizeRichHtml(block.side)}</p>
+      </header>`;
+      }
+
+      function renderPortfolioProject(block) {
+        return `      <section class="project">
+        <div class="project-head">
+          <div>
+            <h2>${sanitizeRichHtml(block.title)}</h2>
+            <p class="period">${sanitizeRichHtml(block.period)}</p>
+          </div>
+          <div class="links">
+${block.links.map((link) => link.href ? `            <a href="${escapeAttr(safeHref(link.href))}">${sanitizeRichHtml(link.label)}</a>` : `            <span>${sanitizeRichHtml(link.label)}</span>`).join("\n")}
+          </div>
+        </div>
+        <p class="summary">${sanitizeRichHtml(block.summary)}</p>
+        <div class="grid">
+${block.columns.map((column) => `          <div class="block">
+            <h3>${sanitizeRichHtml(column.title)}</h3>
+            <ul>
+${column.items.map((item) => `              <li>${sanitizeRichHtml(item)}</li>`).join("\n")}
+            </ul>
+          </div>`).join("\n")}
+        </div>
+${block.effect ? `        <div class="effect">
+          <h3>${sanitizeRichHtml(block.effect.title)}</h3>
+${block.effect.paragraphs.map((text) => `          <p>${sanitizeRichHtml(text)}</p>`).join("\n")}
+        </div>` : ""}
+      </section>`;
+      }
+
+      function renderCareerSection(block) {
+        return `      <section>
+${block.heading ? `        <h2>${sanitizeRichHtml(block.heading)}</h2>` : ""}
+${block.subheading ? `        <h3>${sanitizeRichHtml(block.subheading)}</h3>` : ""}
+${block.company ? renderCompany(block.company) : ""}
+${block.twoBlocks?.length ? renderTwoBlocks(block.twoBlocks) : ""}
+${block.projects?.map(renderCareerProject).join("\n") || ""}
+      </section>`;
+      }
+
+      function renderCompany(company) {
+        return `        <div class="company">
+          <div>
+            <p class="company-name">${sanitizeRichHtml(company.name)}</p>
+            <p class="period">${sanitizeRichHtml(company.period)}</p>
+          </div>
+          <p class="company-desc">${sanitizeRichHtml(company.description)}</p>
+        </div>`;
+      }
+
+      function renderTwoBlocks(blocks) {
+        return `        <div class="two-blocks">
+${blocks.map((block) => `          <div class="block">
+            <p class="${escapeAttr(block.titleClass || "block-title")}">${sanitizeRichHtml(block.title)}</p>
+            <ul>
+${block.items.map((item) => `              <li>${sanitizeRichHtml(item)}</li>`).join("\n")}
+            </ul>
+          </div>`).join("\n")}
+        </div>`;
+      }
+
+      function renderCareerProject(project) {
+        return `        <div class="project">
+          <p class="project-title">${sanitizeRichHtml(project.title)}</p>
+          <ul>
+${project.items.map((item) => `            <li>${sanitizeRichHtml(item)}</li>`).join("\n")}
+          </ul>
+${project.note ? `          <p class="note">${sanitizeRichHtml(project.note)}</p>` : ""}
+        </div>`;
+      }
+
+      function buildDocumentCss(docKey) {
+        const common = state.design.common;
+        const doc = state.design.documents[docKey];
+        const rgb = hexToRgb(doc.accent);
+        const vars = `    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    :root {
+      --paper-width: ${common.paperWidth};
+      --paper-height: ${common.paperHeight};
+      --page-x: ${doc.pageX};
+      --page-y: ${doc.pageY};
+      --ink: ${common.ink};
+      --muted: ${common.muted};
+      --line: ${doc.line};
+      --soft-line: ${doc.softLine};
+      --accent: ${doc.accent};
+      --accent-soft: ${doc.accentSoft};
+      --title: ${common.title};
+      --page-bg: ${common.background};
+      --font-family: ${common.fontFamily};
+      --link-border: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: var(--font-family);
+      font-size: ${doc.fontSize};
+      line-height: ${doc.lineHeight};
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 0.2mm solid var(--link-border);
+    }
+
+    .document {
+      width: var(--paper-width);
+      margin: 0 auto;
+    }
+
+    .page {
+      position: relative;
+      width: var(--paper-width);
+      min-height: var(--paper-height);
+      margin: 10mm auto;
+      padding: var(--page-y) var(--page-x);
+      background: #fff;
+      box-shadow: 0 8mm 24mm rgba(15, 23, 42, 0.14);
+      break-after: page;
+      page-break-after: always;
+    }
+
+    body[data-preview="true"] .page {
+      height: var(--paper-height);
+      overflow: visible;
+    }
+
+    body[data-preview="true"] .page.is-overflowing {
+      outline: 0.8mm solid #d92d20;
+      outline-offset: -0.8mm;
+    }
+
+    .page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .page-mark {
+      position: absolute;
+      top: 8mm;
+      right: var(--page-x);
+      color: var(--muted);
+      font-size: ${docKey === "resume" ? "8.2pt" : "7.8pt"};
+    }`;
+
+        const printCss = `
+    @media print {
+      html,
+      body {
+        width: var(--paper-width);
+        background: #fff;
+      }
+
+      .document {
+        width: var(--paper-width);
+      }
+
+      .page {
+        min-height: var(--paper-height);
+        margin: 0;
+        box-shadow: none;
+      }
+    }`;
+
+        if (docKey === "resume") return vars + resumeCss() + printCss;
+        if (docKey === "portfolio") return vars + portfolioCss() + printCss;
+        return vars + careerCss() + printCss;
+      }
+
+      function resumeCss() {
+        return `
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8.2pt;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 34mm minmax(0, 1fr) 57mm;
+      gap: 7mm;
+      align-items: center;
+      padding-bottom: 8mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 2mm;
+      color: var(--title);
+      font-size: 24pt;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .role {
+      margin-top: 3mm;
+      color: var(--accent);
+      font-size: 12.5pt;
+      font-weight: 700;
+    }
+
+    .intro {
+      margin-top: 3mm;
+      color: #343a46;
+      font-size: 10pt;
+    }
+
+    .self-introduction {
+      margin-top: 7mm;
+      padding-bottom: 6mm;
+      border-bottom: 0.25mm solid var(--soft-line);
+    }
+
+    .self-introduction .intro {
+      max-width: 170mm;
+    }
+
+    .photo-frame {
+      width: 34mm;
+      height: 34mm;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #eaf2f5;
+    }
+
+    .profile-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 2.4mm;
+      align-content: start;
+    }
+
+    .contact-item {
+      display: grid;
+      grid-template-columns: 18mm minmax(0, 1fr);
+      gap: 3mm;
+      align-items: baseline;
+      font-size: 8.9pt;
+    }
+
+    .contact-item dt {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .contact-item dd {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    section {
+      margin-top: 8mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      color: var(--title);
+      font-size: 13.5pt;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    h2::before {
+      content: "";
+      display: block;
+      width: 3mm;
+      height: 3mm;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .summary-text {
+      margin-top: 3.2mm;
+      color: #3c4048;
+      font-size: 10.2pt;
+    }
+
+    .achievement-list {
+      display: grid;
+      gap: 4.5mm;
+      margin: 4mm 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: achievement;
+    }
+
+    .achievement-list li {
+      display: grid;
+      grid-template-columns: 9mm minmax(0, 1fr);
+      gap: 3.5mm;
+      padding: 3.6mm 0 0;
+      border-top: 0.25mm solid var(--soft-line);
+      counter-increment: achievement;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .achievement-list li::before {
+      content: counter(achievement);
+      display: grid;
+      width: 7mm;
+      height: 7mm;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 8.6pt;
+      font-weight: 800;
+    }
+
+    .achievement-list strong {
+      display: block;
+      margin-bottom: 1.2mm;
+      color: var(--title);
+      font-size: 10.4pt;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7mm;
+      align-items: start;
+    }
+
+    .item-stack {
+      display: grid;
+      gap: 4.2mm;
+      margin-top: 4mm;
+    }
+
+    .item {
+      padding-top: 3.2mm;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .item-title {
+      color: var(--title);
+      font-size: 10.2pt;
+      font-weight: 800;
+    }
+
+    .item-meta {
+      margin-top: 0.8mm;
+      color: var(--muted);
+      font-size: 8.5pt;
+      font-weight: 700;
+    }
+
+    .item p {
+      margin-top: 1.5mm;
+      color: #3c4048;
+    }
+
+    .certificate-list,
+    .prize-list {
+      margin: 4mm 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .certificate-list li,
+    .prize-list li {
+      display: grid;
+      grid-template-columns: 26mm minmax(0, 1fr);
+      gap: 3.5mm;
+      padding: 2.6mm 0;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 8.6pt;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.6pt;
+      text-align: right;
+    }`;
+      }
+
+      function portfolioCss() {
+        return `
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .doc-header {
+      display: grid;
+      grid-template-columns: 1fr 42mm;
+      gap: 8mm;
+      padding-bottom: 5.5mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8pt;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin-top: 1.6mm;
+      color: var(--title);
+      font-size: 22pt;
+      line-height: 1.1;
+      font-weight: 850;
+    }
+
+    .headline {
+      margin-top: 2.4mm;
+      color: #343a46;
+      font-size: 9.7pt;
+    }
+
+    .contact {
+      align-self: end;
+      color: var(--muted);
+      font-size: 8.2pt;
+      text-align: right;
+    }
+
+    .project {
+      margin-top: 6mm;
+      padding-top: 4.5mm;
+      border-top: 0.28mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .project:first-of-type {
+      border-top: 0;
+    }
+
+    .project-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 5mm;
+      align-items: start;
+    }
+
+    h2 {
+      color: var(--title);
+      font-size: 13.2pt;
+      line-height: 1.18;
+      font-weight: 850;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 2mm;
+      max-width: 68mm;
+      font-size: 8.2pt;
+      font-weight: 800;
+    }
+
+    .period {
+      margin-top: 1.5mm;
+      color: var(--muted);
+      font-size: 8.2pt;
+      font-weight: 800;
+    }
+
+    .summary {
+      margin-top: 2.5mm;
+      color: #343a46;
+      font-size: 9.2pt;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 3.6mm;
+      align-items: start;
+    }
+
+    .block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h3 {
+      color: var(--accent);
+      font-size: 9.2pt;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    ul {
+      margin: 1.7mm 0 0;
+      padding-left: 4.2mm;
+    }
+
+    li {
+      margin-top: 0.9mm;
+    }
+
+    .effect {
+      margin-top: 3.2mm;
+      padding: 3mm;
+      background: var(--accent-soft);
+      border-left: 0.8mm solid var(--accent);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .effect p + p {
+      margin-top: 1mm;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.5pt;
+      text-align: right;
+    }`;
+      }
+
+      function careerCss() {
+        return `
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin: 0;
+    }
+
+    .doc-header {
+      display: grid;
+      grid-template-columns: 1fr 38mm;
+      gap: 8mm;
+      padding-bottom: 5mm;
+      border-bottom: 0.35mm solid var(--line);
+    }
+
+    .doc-label {
+      color: var(--muted);
+      font-size: 8pt;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin-top: 1.5mm;
+      color: var(--title);
+      font-size: 21pt;
+      line-height: 1.12;
+      font-weight: 850;
+    }
+
+    .headline {
+      margin-top: 2.5mm;
+      color: #343a46;
+      font-size: 9.6pt;
+    }
+
+    .profile {
+      align-self: end;
+      color: var(--muted);
+      font-size: 8.2pt;
+      text-align: right;
+    }
+
+    section {
+      margin-top: 5.8mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+      color: var(--title);
+      font-size: 12.2pt;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    h2::before {
+      content: "";
+      display: block;
+      width: 3mm;
+      height: 3mm;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h3 {
+      margin-top: 4.5mm;
+      padding: 2.6mm 3.2mm;
+      border-left: 1mm solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--title);
+      font-size: 10.4pt;
+      line-height: 1.28;
+      font-weight: 850;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h4 {
+      margin-top: 3.4mm;
+      color: var(--accent);
+      font-size: 9.2pt;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .company {
+      display: grid;
+      grid-template-columns: 38mm minmax(0, 1fr);
+      gap: 6mm;
+      margin-top: 4mm;
+      padding-top: 4mm;
+      border-top: 0.25mm solid var(--soft-line);
+    }
+
+    .company-name {
+      color: var(--title);
+      font-size: 11.4pt;
+      font-weight: 850;
+    }
+
+    .period {
+      margin-top: 1mm;
+      color: var(--muted);
+      font-size: 8.1pt;
+      font-weight: 800;
+    }
+
+    .company-desc {
+      color: #353b45;
+    }
+
+    .two-blocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 4mm;
+    }
+
+    .block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .block-title {
+      color: var(--title);
+      font-weight: 850;
+    }
+
+    ul {
+      margin: 1.8mm 0 0;
+      padding-left: 4.2mm;
+    }
+
+    li {
+      margin-top: 0.9mm;
+    }
+
+    .project {
+      margin-top: 4.5mm;
+      padding-top: 3.8mm;
+      border-top: 0.25mm solid var(--soft-line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .project:first-of-type {
+      border-top: 0;
+    }
+
+    .project-title {
+      color: var(--title);
+      font-size: 10.5pt;
+      font-weight: 850;
+    }
+
+    .note {
+      margin-top: 2mm;
+      color: var(--muted);
+      font-size: 8.2pt;
+    }
+
+    .metric {
+      color: var(--accent);
+      font-weight: 850;
+    }
+
+    footer {
+      position: absolute;
+      right: var(--page-x);
+      bottom: 8mm;
+      left: var(--page-x);
+      color: #8a9099;
+      font-size: 7.5pt;
+      text-align: right;
+    }`;
+      }
+
+      function hexToRgb(hex) {
+        const normalized = /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.slice(1) : "2457a6";
+        return {
+          r: parseInt(normalized.slice(0, 2), 16),
+          g: parseInt(normalized.slice(2, 4), 16),
+          b: parseInt(normalized.slice(4, 6), 16)
+        };
+      }
+
+      function updatePreview() {
+        overflowStatusEl.textContent = "A4";
+        overflowStatusEl.classList.remove("warning");
+        previewFrameEl.srcdoc = renderFullHtml(activeDoc, { preview: true });
+      }
+
+      function markOverflow() {
+        const doc = previewFrameEl.contentDocument;
+        if (!doc) return;
+        const pages = Array.from(doc.querySelectorAll(".page"));
+        const overflowing = [];
+        pages.forEach((page, index) => {
+          page.classList.remove("is-overflowing");
+          if (page.scrollHeight > page.clientHeight + 4) {
+            page.classList.add("is-overflowing");
+            overflowing.push(index + 1);
+          }
+        });
+        if (overflowing.length) {
+          overflowStatusEl.textContent = `초과: ${overflowing.join(", ")}p`;
+          overflowStatusEl.classList.add("warning");
+        } else {
+          overflowStatusEl.textContent = "A4";
+          overflowStatusEl.classList.remove("warning");
+        }
+      }
+
+      function download(filename, content, type = "text/html") {
+        const blob = new Blob([content], { type: `${type};charset=utf-8` });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+      }
+
+      function exportJson() {
+        download("resume-editor-data.json", JSON.stringify(state, null, 2), "application/json");
+      }
+
+      function exportHtml(docKey) {
+        const meta = state.design.documents[docKey];
+        download(meta.filename || `${docKey}.html`, renderFullHtml(docKey));
+      }
+
+      function handleButtonClick(event) {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+        const action = button.dataset.action;
+
+        if (action === "switch-doc") {
+          activeDoc = button.dataset.doc;
+          renderAll();
+          return;
+        }
+        if (action === "export-json") {
+          exportJson();
+          return;
+        }
+        if (action === "import-json") {
+          importInputEl.click();
+          return;
+        }
+        if (action === "export-current") {
+          exportHtml(activeDoc);
+          return;
+        }
+        if (action === "export-html") {
+          DOC_KEYS.forEach(exportHtml);
+          return;
+        }
+        if (action === "reset") {
+          if (window.confirm("저장된 편집 데이터를 초기화할까요?")) {
+            state = clone(DEFAULT_DATA);
+            localStorage.removeItem(STORAGE_KEY);
+            renderAll();
+            saveStatusEl.textContent = "초기화됨";
+          }
+          return;
+        }
+
+        const path = button.dataset.path;
+        const index = Number(button.dataset.index);
+        if (action === "add") {
+          const items = getPath(state, path);
+          items.push(createDefault(button.dataset.kind));
+        }
+        if (action === "remove") {
+          const items = getPath(state, path);
+          items.splice(index, 1);
+        }
+        if (action === "move-up" && index > 0) {
+          const items = getPath(state, path);
+          [items[index - 1], items[index]] = [items[index], items[index - 1]];
+        }
+        if (action === "move-down") {
+          const items = getPath(state, path);
+          if (index < items.length - 1) [items[index], items[index + 1]] = [items[index + 1], items[index]];
+        }
+        if (action === "set-effect") {
+          setPath(state, path, { title: "기대 효과", paragraphs: ["새 문장"] });
+        }
+        if (action === "clear-effect") {
+          setPath(state, path, null);
+        }
+        if (action === "set-company") {
+          setPath(state, path, { name: "회사명", period: "기간", description: "회사 설명" });
+        }
+        if (action === "clear-company") {
+          setPath(state, path, null);
+        }
+        saveState();
+        renderAll();
+      }
+
+      function handleInput(event) {
+        const input = event.target.closest("[data-path]");
+        if (!input) return;
+        setPath(state, input.dataset.path, input.value);
+        saveState();
+        updatePreview();
+      }
+
+      function handleImport(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const imported = JSON.parse(String(reader.result || ""));
+            state = mergeDefaults(DEFAULT_DATA, imported);
+            saveState();
+            renderAll();
+          } catch (error) {
+            window.alert("JSON 파일을 읽을 수 없습니다.");
+            console.error(error);
+          } finally {
+            importInputEl.value = "";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      document.addEventListener("click", handleButtonClick);
+      document.addEventListener("input", handleInput);
+      document.addEventListener("change", handleInput);
+      importInputEl.addEventListener("change", handleImport);
+      previewFrameEl.addEventListener("load", markOverflow);
+
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
